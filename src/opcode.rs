@@ -5,6 +5,10 @@ pub enum OpCode {
     Mul,
     Div,
     Push,
+
+    StoreVar,
+    LoadVar,
+
     Halt
 }
 
@@ -17,6 +21,8 @@ impl OpCode {
             3 => Some(OpCode::Div),
             4 => Some(OpCode::Push),
             5 => Some(OpCode::Halt),
+            6 => Some(OpCode::StoreVar),
+            7 => Some(OpCode::LoadVar),
             _ => None,
         }
     }
@@ -28,6 +34,8 @@ impl OpCode {
             OpCode::Div => 3,
             OpCode::Push => 4,
             OpCode::Halt => 5,
+            OpCode::StoreVar => 6,
+            OpCode::LoadVar => 7,
         }
     }
 }
