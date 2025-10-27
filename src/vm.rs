@@ -168,6 +168,11 @@ impl VM {
         &self.stack
     }
 
+    // helper function
+    pub fn get_variable(&self, name: &str) -> Result<Value, VMError> {
+        self.memory.load_solution(name)
+    }
+
 }
 
 #[cfg(test)]

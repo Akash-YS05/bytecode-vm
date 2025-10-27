@@ -20,7 +20,7 @@ impl Memory {
         self.variables.insert(name, value);
     }
 
-    pub fn load_solution(&mut self, name: &str) -> Result<Value, VMError> {
+    pub fn load_solution(&self, name: &str) -> Result<Value, VMError> {
         self.variables
             .get(name)
             .copied()       //copy the value (works because Value implements Copy)

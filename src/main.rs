@@ -9,14 +9,153 @@ use opcode::OpCode;
 
 fn main() {
     
-    example_addition();
-    
-    example_complex();
-    
-    example_errors();
+    // example_addition();
+    // example_complex();
+    // example_errors();
+    // example_with_builder();
 
-    example_with_builder();
+    // example_simple_variable();
+    // example_variable_arithmetic();
+
+    fibonacci_implementation();
     
+}
+
+fn encode_i64(n: i64) -> Vec<u8> {
+    n.to_le_bytes().to_vec()
+}
+
+fn encode_string(s: &str) -> Vec<u8> {
+    let mut bytes = vec![s.len() as u8];
+    bytes.extend_from_slice(s.as_bytes());
+
+    bytes
+}
+
+fn example_simple_variable() {
+    println!("Example: Simple Variable Storage and Retrieval");
+    println!("Code: x=42");
+
+    let mut vm = VM::new();
+    let mut bytecode: Vec<u8> = vec![];
+
+    // push 42
+    bytecode.push(OpCode::Push.convert_to_u8());
+    bytecode.extend(encode_i64(42));
+
+    bytecode.push(OpCode::StoreVar.convert_to_u8());
+    bytecode.extend(encode_string("x"));
+
+    bytecode.push(OpCode::LoadVar.convert_to_u8());
+    bytecode.extend(encode_string("x"));
+
+    bytecode.push(OpCode::Halt.convert_to_u8());
+
+    vm.load_bytecode_solution(bytecode);
+
+    match vm.run_solution() {
+        Ok(_) => {
+            println!("x = {:?}", vm.get_variable("x"));
+            println!("Stack top: {:?}\n", vm.peek_stack());
+        }
+        Err(e) => println!("Error: {}\n", e),
+    }
+
+}
+
+fn example_variable_arithmetic() {
+    println!("Example: Variable Arithmetic");
+    println!("Code: (a / b) * c where a=10 and b=2 and c=3");
+
+    let mut vm = VM::new();
+    let mut bytecode: Vec<u8> = vec![];
+
+    bytecode.push(OpCode::Push.convert_to_u8());
+    bytecode.extend(encode_i64(10));
+    bytecode.push(OpCode::StoreVar.convert_to_u8());
+    bytecode.extend(encode_string("a"));
+
+    bytecode.push(OpCode::Push.convert_to_u8());
+    bytecode.extend(encode_i64(2));
+    bytecode.push(OpCode::StoreVar.convert_to_u8());
+    bytecode.extend(encode_string("b"));
+
+    bytecode.push(OpCode::Push.convert_to_u8());
+    bytecode.extend(encode_i64(3));
+    bytecode.push(OpCode::StoreVar.convert_to_u8());
+    bytecode.extend(encode_string("c"));
+
+    //result: (a/b)*c
+    bytecode.push(OpCode::LoadVar.convert_to_u8());
+    bytecode.extend(encode_string("a"));
+    bytecode.push(OpCode::LoadVar.convert_to_u8());
+    bytecode.extend(encode_string("b"));
+    bytecode.push(OpCode::Div.convert_to_u8());
+
+    bytecode.push(OpCode::LoadVar.convert_to_u8());
+    bytecode.extend(encode_string("c"));
+    bytecode.push(OpCode::Mul.convert_to_u8());
+
+    bytecode.push(OpCode::StoreVar.convert_to_u8());
+    bytecode.extend(encode_string("result"));
+
+    bytecode.push(OpCode::Halt.convert_to_u8());
+
+    vm.load_bytecode_solution(bytecode);
+
+    match vm.run_solution() {
+        Ok(_) => {
+            println!("a = {:?}", vm.get_variable("a"));
+            println!("b = {:?}", vm.get_variable("b"));
+            println!("c = {:?}", vm.get_variable("c"));
+            println!("result = {:?}", vm.get_variable("result"));
+            println!("Expected: Integer(15)\n");
+        }
+        Err(e) => println!("Error: {}\n", e),
+    }
+    
+}
+
+fn fibonacci_implementation() {
+    println!("Fibonacci Implementation Example (f0 = 0, f1 = 1)");
+
+    let mut vm = VM::new();
+    let mut bytecode: Vec<u8> = vec![];
+
+    bytecode.push(OpCode::Push.convert_to_u8());
+    bytecode.extend(encode_i64(0));
+    bytecode.push(OpCode::StoreVar.convert_to_u8());
+    bytecode.extend(encode_string("f0"));
+
+    bytecode.push(OpCode::Push.convert_to_u8());
+    bytecode.extend(encode_i64(1));
+    bytecode.push(OpCode::StoreVar.convert_to_u8());
+    bytecode.extend(encode_string("f1"));
+
+    // Compute f2 = f0 + f1
+    bytecode.push(OpCode::LoadVar.convert_to_u8());
+    bytecode.extend(encode_string("f0"));
+    bytecode.push(OpCode::LoadVar.convert_to_u8());
+    bytecode.extend(encode_string("f1"));
+    bytecode.push(OpCode::Add.convert_to_u8());
+
+    bytecode.push(OpCode::StoreVar.convert_to_u8());
+    bytecode.extend(encode_string("f2"));
+
+    bytecode.push(OpCode::Halt.convert_to_u8());
+
+    vm.load_bytecode_solution(bytecode);
+    
+    match vm.run_solution() {
+        Ok(_) => {
+            println!("f0 = {:?}", vm.get_variable("f0"));
+            println!("f1 = {:?}", vm.get_variable("f1"));
+            println!("f2 = {:?}", vm.get_variable("f2"));
+        }
+        Err(e) => println!("Error: {}", e),
+    }
+
+
 }
 
 fn example_addition() {
