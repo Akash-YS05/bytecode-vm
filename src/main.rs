@@ -2,6 +2,7 @@ mod opcode;
 mod value;
 mod error;
 mod vm;
+mod memory;
 
 use vm::VM;
 use opcode::OpCode;
@@ -50,7 +51,7 @@ fn example_complex() {
     
     let mut vm = VM::new();
     
-    // Bytecode for: (20 / 4) * 3 - 2
+    // bytecode for the expression
     let bytecode = vec![
         OpCode::Push.convert_to_u8(), 20,
         OpCode::Push.convert_to_u8(), 4,
