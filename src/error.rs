@@ -7,6 +7,8 @@ pub enum VMError {
     InvalidOpCode(u8),
     InvalidOperand,
     OutOfBounds,
+    UndefinedVariable(String),
+    InvalidString,
 }
 
 impl fmt::Display for VMError {
@@ -27,6 +29,12 @@ impl fmt::Display for VMError {
             }
             VMError::OutOfBounds => {
                 write!(f, "Instruction pointer out of bounds")
+            }
+            VMError::UndefinedVariable(name) => {
+                write!(f, "Undefined variable: {}", name)
+            }
+            VMError::InvalidString => {
+                write!(f, "Invalid string encoding")
             }
         }
     }
