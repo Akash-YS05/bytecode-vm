@@ -27,4 +27,8 @@ impl Memory {
             .ok_or_else(|| VMError::UndefinedVariable(name.to_string()))
     }
 
+    pub fn clear(&mut self) {
+        self.variables.clear();
+    }
+
 }

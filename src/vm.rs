@@ -1,6 +1,7 @@
 use crate::opcode::OpCode;
 use crate::value::Value;
 use crate::error::VMError;
+use crate::memory::Memory;
 
 pub struct VM {
     // intermediate values are stored in this stack
@@ -14,6 +15,9 @@ pub struct VM {
 
     //confirmation if VM is still running
     running: bool,
+
+    //memory for storing variables
+    memory: Memory,
 }
 
 impl VM {
@@ -22,7 +26,8 @@ impl VM {
             stack: Vec::new(),
             bytecode: Vec::new(),
             ip: 0,
-            running: false
+            running: false,
+            memory: Memory::new_solution(),
         }
     }
 
@@ -32,6 +37,7 @@ impl VM {
         self.bytecode = code;
         self.ip = 0;
         self.running = false;
+        self.memory.clear();
     }
 
     fn push(&mut self, value: Value) {
@@ -58,6 +64,27 @@ impl VM {
         self.ip += 1;
 
         Ok(byte)
+    }
+
+    fn read_string_solution(&mut self) -> Result<String, VMError> {
+
+        // reading the length and that many bytes
+        let length = self.read_byte()? as usize;
+        let mut bytes = Vec::with_capacity(length);
+
+        for _ in 0..length {
+            bytes.push(self.read_byte()?);
+        }
+
+        String::from_utf8(bytes).map_err(|_| VMError::InvalidString)
+    }
+
+    fn read_i64_solution(&mut self) -> Result<i64, VMError> {
+        let mut bytes = [0u8; 8];
+        for i in 0..8 {
+            bytes[i] = self.read_byte()?;
+        }
+        Ok(i64::from_le_bytes(bytes))
     }
     
     // Execute a single instruction
@@ -100,8 +127,18 @@ impl VM {
             }
             OpCode::Push => {
                 // Read the next byte as the value to push
-                let value_byte = self.read_byte()?;
+                let value_byte = self.read_i64_solution()?;
                 self.push(Value::int_solution(value_byte as i64));
+            }
+            OpCode::StoreVar => {
+                let name = self.read_string_solution()?;
+                let value = self.pop()?;
+                self.memory.store_solution(name, value);
+            }
+            OpCode::LoadVar => {
+                let name = self.read_string_solution()?;
+                let value = self.memory.load_solution(&name)?;
+                self.push(value);
             }
             OpCode::Halt => {
                 self.running = false;
