@@ -86,6 +86,14 @@ impl VM {
         }
         Ok(i64::from_le_bytes(bytes))
     }
+
+    fn read_usize_solution(&mut self) -> Result<usize, VMError> {
+        let mut bytes = [0u8; 8];
+        for i in 0..8 {
+            bytes[i] = self.read_byte()?;
+        }
+        Ok(usize::from_le_bytes(bytes))
+    }
     
     // Execute a single instruction
     fn execute_instruction(&mut self) -> Result<(), VMError> {
@@ -140,6 +148,71 @@ impl VM {
                 let value = self.memory.load_solution(&name)?;
                 self.push(value);
             }
+            OpCode::Gt => {
+                let b = self.pop()?;
+                let a = self.pop()?;
+                let result = a.gt_solution(b)
+                    .ok_or(VMError::InvalidOperand)?;
+                self.push(result);
+            }
+            OpCode::Lt => {
+                let b = self.pop()?;
+                let a = self.pop()?;
+                let result = a.lt_solution(b)
+                    .ok_or(VMError::InvalidOperand)?;
+                self.push(result);
+            }
+            OpCode::Gte => {
+                let b = self.pop()?;
+                let a = self.pop()?;
+                let result = a.gte_solution(b)
+                    .ok_or(VMError::InvalidOperand)?;
+                self.push(result);
+            }
+            OpCode::Lte => {
+                let b = self.pop()?;
+                let a = self.pop()?;
+                let result = a.lte_solution(b)
+                    .ok_or(VMError::InvalidOperand)?;
+                self.push(result);
+            }
+            OpCode::Eq => {
+                let b = self.pop()?;
+                let a = self.pop()?;
+                let result = a.eq_solution(b)
+                    .ok_or(VMError::InvalidOperand)?;
+                self.push(result);
+            }
+            OpCode::Neq => {
+                let b = self.pop()?;
+                let a = self.pop()?;
+                let result = a.neq_solution(b)
+                    .ok_or(VMError::InvalidOperand)?;
+                self.push(result);
+            }
+
+            //read the address and set the ip to that address
+            OpCode::Jump => {
+                let address = self.read_usize_solution()?;
+                if address >= self.bytecode.len() {
+                    return Err(VMError::OutOfBounds);
+                }
+                self.ip = address;
+            }
+
+            //read address, pop a value, jump to address if falsy or continue
+            OpCode::JumpIfFalse => {
+                let address = self.read_usize_solution()?;
+                let condition = self.pop()?;
+
+                if !condition.is_truthy_solution() {
+                    if address >= self.bytecode.len() {
+                        return Err(VMError::OutOfBounds);
+                    }
+                    self.ip = address;
+                }
+                //after this it'll just continue as ip has already advanced
+             }
             OpCode::Halt => {
                 self.running = false;
             }
@@ -150,8 +223,15 @@ impl VM {
     
     pub fn run_solution(&mut self) -> Result<(), VMError> {
         self.running = true;
+
+        let max_instructions = 100_00;
+        let mut instruction_count = 0;
         
         while self.running {
+            instruction_count += 1;
+            if instruction_count > max_instructions {
+                return Err(VMError::InfiniteLoopDetected);
+            }
             self.execute_instruction()?;
         }
         
@@ -171,6 +251,10 @@ impl VM {
     // helper function
     pub fn get_variable(&self, name: &str) -> Result<Value, VMError> {
         self.memory.load_solution(name)
+    }
+
+    pub fn current_ip(&self) -> usize {
+        self.ip
     }
 
 }
