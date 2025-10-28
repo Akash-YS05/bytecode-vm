@@ -12,7 +12,10 @@ use examples::*;
 
 fn main() {
     
-    variable::example_variable_arithmetic();
+    // variable::example_variable_arithmetic();
+    controls::example_simple_comparison();
+    controls::example_while_loop();
+    
 
 }
 

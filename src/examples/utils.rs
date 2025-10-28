@@ -8,3 +8,7 @@ pub fn encode_string(s: &str) -> Vec<u8> {
 
     bytes
 }
+
+pub fn encode_usize(n: usize) -> Vec<u8> {
+    n.to_le_bytes().to_vec()
+}
