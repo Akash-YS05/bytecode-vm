@@ -9,6 +9,7 @@ pub enum VMError {
     OutOfBounds,
     UndefinedVariable(String),
     InvalidString,
+    InfiniteLoopDetected,
 }
 
 impl fmt::Display for VMError {
@@ -35,6 +36,9 @@ impl fmt::Display for VMError {
             }
             VMError::InvalidString => {
                 write!(f, "Invalid string encoding")
+            }
+            VMError::InfiniteLoopDetected => {
+                write!(f, "Infinite loop detected")
             }
         }
     }
