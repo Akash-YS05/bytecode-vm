@@ -1,14 +1,29 @@
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum OpCode {
+    //arithmetic operations
     Add,
     Sub,
     Mul,
     Div,
     Push,
 
+    //variables
     StoreVar,
     LoadVar,
 
+    //comparison operators
+    Gt,
+    Lt,
+    Gte,
+    Lte,
+    Eq,
+    Neq,
+
+    //control flow
+    Jump,   //unconditional jump
+    JumpIfFalse,    //jump if T.O.S is falsy
+
+    //program termination
     Halt
 }
 
