@@ -1,6 +1,7 @@
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Value {
     Integer(i64),
+    Boolean(bool),
 }
 
 impl Value {
@@ -14,24 +15,28 @@ impl Value {
     pub fn as_int_solution(&self) -> Option<i64> {
         match self {
             Value::Integer(n) => Some(*n),
+            _ => None,
         }
     }
     
     pub fn add_solution(self, other: Value) -> Option<Value> {
         match (self, other) {
             (Value::Integer(a), Value::Integer(b)) => Some(Value::Integer(a + b)),
+            _ => None,
         }
     }
     
     pub fn sub_solution(self, other: Value) -> Option<Value> {
         match (self, other) {
             (Value::Integer(a), Value::Integer(b)) => Some(Value::Integer(a - b)),
+            _ => None,
         }
     }
     
     pub fn mul_solution(self, other: Value) -> Option<Value> {
         match (self, other) {
             (Value::Integer(a), Value::Integer(b)) => Some(Value::Integer(a * b)),
+            _ => None,
         }
     }
     
@@ -43,8 +48,76 @@ impl Value {
                 } else {
                     Some(Value::Integer(a / b))
                 }
-            }
+            },
+            _ => None,
         }
+    }
+
+    pub fn bool_solution(b: bool) -> Self {
+        Value::Boolean(b)
+    }
+
+    pub fn as_bool_solution(&self) -> Option<bool> {
+        match self {
+            Value::Boolean(b) => Some(*b),
+            _ => None
+        }
+    }
+
+    // check if val is truthy => truthy if non 0, else false
+    pub fn is_truthy_solution(&self) -> bool {
+        match self {
+            Value::Boolean(b) => *b,
+            Value::Integer(n) => *n != 0
+        }
+    }
+
+    // cases for greater than, less than, equal to, >=, <=
+    pub fn gt_solution(self, other: Value) -> Option<Value> {
+        match (self, other) {
+            (Value::Integer(a), Value::Integer(b)) => Some(Value::Boolean(a>b)),
+            _ => None,
+        }
+    }
+
+    pub fn lt_solution(self, other: Value) -> Option<Value> {
+        match (self, other) {
+            (Value::Integer(a), Value::Integer(b)) => Some(Value::Boolean(a<b)),
+            _ => None,
+        }
+    }
+
+    pub fn gte_solution(self, other: Value) -> Option<Value> {
+        match (self, other) {
+            (Value::Integer(a), Value::Integer(b)) => Some(Value::Boolean(a>=b)),
+            _ => None,
+        }
+    }
+    pub fn lte_solution(self, other: Value) -> Option<Value> {
+        match (self, other) {
+            (Value::Integer(a), Value::Integer(b)) => Some(Value::Boolean(a<=b)),
+            _ => None,
+        }
+    }
+
+    pub fn eq_solution(self, other: Value) -> Option<Value> {
+        let result = match (self, other) {
+            (Value::Integer(a), Value::Integer(b)) => a == b,
+            (Value::Boolean(a), Value::Boolean(b)) => a == b,
+            _ => return None,
+        };
+
+        Some(Value::Boolean(result))
+    }
+
+    pub fn neq_solution(self, other: Value) -> Option<Value> {
+        let result = match (self, other) {
+            (Value::Integer(a), Value::Integer(b)) => a != b,
+            (Value::Boolean(a), Value::Boolean(b)) => a != b,
+            _ => return None,
+        };
+
+        Some(Value::Boolean(result))
     }
 }
 
