@@ -38,6 +38,14 @@ impl OpCode {
             5 => Some(OpCode::Halt),
             6 => Some(OpCode::StoreVar),
             7 => Some(OpCode::LoadVar),
+            8 => Some(OpCode::Gt),
+            9 => Some(OpCode::Lt),
+            10 => Some(OpCode::Gte),
+            11 => Some(OpCode::Lte),
+            12 => Some(OpCode::Eq),
+            13  => Some(OpCode::Neq),
+            14 => Some(OpCode::Jump),
+            15 => Some(OpCode::JumpIfFalse),
             _ => None,
         }
     }
@@ -51,6 +59,35 @@ impl OpCode {
             OpCode::Halt => 5,
             OpCode::StoreVar => 6,
             OpCode::LoadVar => 7,
+            OpCode::Gt => 8,
+            OpCode::Lt => 9,
+            OpCode::Gte => 10,
+            OpCode::Lte => 11,
+            OpCode::Eq => 12,
+            OpCode::Neq => 13,
+            OpCode::Jump => 14,
+            OpCode::JumpIfFalse => 15,
+        }
+    }
+
+    pub fn name(&self) -> &'static str {
+        match self {
+            OpCode::Push => "PUSH",
+            OpCode::Add => "ADD",
+            OpCode::Sub => "SUB",
+            OpCode::Mul => "MUL",
+            OpCode::Div => "DIV",
+            OpCode::StoreVar => "STORE_VAR",
+            OpCode::LoadVar => "LOAD_VAR",
+            OpCode::Gt => "GT",
+            OpCode::Lt => "LT",
+            OpCode::Gte => "GTE",
+            OpCode::Lte => "LTE",
+            OpCode::Eq => "EQ",
+            OpCode::Neq => "NEQ",
+            OpCode::Jump => "JUMP",
+            OpCode::JumpIfFalse => "JUMP_IF_FALSE",
+            OpCode::Halt => "HALT",
         }
     }
 }
