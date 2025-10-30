@@ -4,6 +4,7 @@ mod error;
 mod vm;
 mod memory;
 mod examples;
+mod disassembler;
 
 use vm::VM;
 use opcode::OpCode;
