@@ -315,7 +315,7 @@ impl VM {
                 self.print_stack_trace();
                 return Err(e);
             }
-            self.execute_instruction()?;
+            // self.execute_instruction()?;
         }
         
         Ok(())

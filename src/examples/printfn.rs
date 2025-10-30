@@ -106,8 +106,9 @@ pub fn example_factorial_with_print() {
 }
 
 pub fn example_disassembler() {
-    println!("Example 3: Bytecode Disassembler");
+    println!("Demo 4: Bytecode Disassembler");
     
+    // Create simple bytecode
     let mut bytecode = vec![];
     
     bytecode.push(OpCode::Push.convert_to_u8());
@@ -123,13 +124,21 @@ pub fn example_disassembler() {
     
     bytecode.push(OpCode::Halt.convert_to_u8());
     
-    // disassemble the bytecode
+    // Disassemble it (clone to avoid consuming original)
     let disassembly = disassemble(bytecode.clone());
+    println!("Bytecode Disassembly:");
     println!("{}", disassembly);
     
+    // Now run it (use the original bytecode)
     println!("Execution output: ");
     let mut vm = VM::new();
-    vm.load_bytecode_solution(bytecode);
-    vm.run_solution().unwrap();
-    println!("\n");
+    vm.load_bytecode_solution(bytecode); // Use original, not clone
+    
+    match vm.run_solution() {
+        Ok(_) => println!(" <- Program completed successfully"),
+        Err(e) => eprintln!("Error: {}", e),
+    }
+    
+    println!();
 }
+

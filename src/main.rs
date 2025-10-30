@@ -19,7 +19,7 @@ fn main() {
     // controls::example_while_loop();
 
     printfn::example_hello_world();
-    // printfn::example_factorial_with_print();
+    printfn::example_factorial_with_print();
     printfn::example_disassembler();
     
 
