@@ -2,10 +2,15 @@ use crate::opcode::OpCode;
 use crate::value::Value;
 use crate::error::VMError;
 use crate::memory::Memory;
+use crate::callframe::CallFrame;
+use std::io::{self, Write};
 
 pub struct VM {
     // intermediate values are stored in this stack
     stack: Vec<Value>,
+
+    // call stack for function calls
+    call_stack: Vec<CallFrame>,
 
     // the bytecode program (operands + instructions)
     bytecode: Vec<u8>,
@@ -24,6 +29,7 @@ impl VM {
     pub fn new() -> Self {
         VM {
             stack: Vec::new(),
+            call_stack: vec![CallFrame::new_solution(0)],
             bytecode: Vec::new(),
             ip: 0,
             running: false,
@@ -34,6 +40,7 @@ impl VM {
     //load into stack
     pub fn load_bytecode_solution(&mut self, code: Vec<u8>) {
         self.stack.clear();
+        self.call_stack = vec![CallFrame::new_solution(0)];
         self.bytecode = code;
         self.ip = 0;
         self.running = false;
@@ -94,13 +101,29 @@ impl VM {
         }
         Ok(usize::from_le_bytes(bytes))
     }
+
+    fn current_frame_mut(&mut self) -> Result<&mut CallFrame, VMError> {
+        self.call_stack.last_mut().ok_or(VMError::StackUnderflow)
+    }
+
+    fn current_frame(&self) -> Result<&CallFrame, VMError> {
+        self.call_stack.last().ok_or(VMError::StackUnderflow)
+    }
+
+    fn print_stack_trace(&self) {
+        eprintln!("\n=== Call Stack Trace ===");
+        for (i, frame) in self.call_stack.iter().enumerate().rev() {
+            eprintln!("  #{} at IP {}", i, frame.return_address());
+        }
+        eprintln!("  Current IP: {}", self.ip); 
+    }
     
     // Execute a single instruction
     fn execute_instruction(&mut self) -> Result<(), VMError> {
         // 1. Read the next byte (this is the opcode)
         // 2. Convert it to an OpCode using OpCode::from_u8
         // 3. Match on the opcode and execute it:
-
+        let start_ip = self.ip;
         let byte = self.read_byte()?;
         let opcode = OpCode::convert_from_u8(byte).ok_or(VMError::InvalidOpCode(byte))?;
 
@@ -213,13 +236,69 @@ impl VM {
                 }
                 //after this it'll just continue as ip has already advanced
              }
+             OpCode::Call => {
+                let function_address = self.read_usize_solution()?;
+                let return_address = self.ip;
+                let frame = CallFrame::new_solution(return_address);
+                self.call_stack.push(frame);
+
+                if function_address >= self.bytecode.len() {
+                    return Err(VMError::OutOfBounds);
+                }
+
+                self.ip = function_address;
+             }
+             OpCode::Return => {
+                if self.call_stack.len() <= 1 {
+                    self.running = false;
+                    return Ok(());
+                }
+                
+                let frame = self.call_stack.pop().ok_or(VMError::StackUnderflow)?;
+                self.ip = frame.return_address();
+             }
+             OpCode::StoreLocal => {
+                let name = self.read_string_solution()?;
+                let value = self.pop()?;
+                self.current_frame_mut()?.store_local_solution(name, value);
+            }
+            
+            OpCode::LoadLocal => {
+                let name = self.read_string_solution()?;
+                let value = self.current_frame()?
+                    .load_local_solution(&name)
+                    .ok_or_else(|| VMError::UndefinedVariable(name.clone()))?;
+                self.push(value);
+            }
+            OpCode::Print => {
+                let text = self.read_string_solution()?;
+                print!("{}", text);
+                io::stdout().flush().ok();
+            }
+            OpCode::PrintVal => {
+                let value = self.pop()?;
+                let output = match value {
+                    Value::Integer(n) => n.to_string(),
+                    Value::Boolean(b) => b.to_string(),
+                };
+                print!("{}", output);
+                io::stdout().flush().ok();
+            }
+            
+            OpCode::PrintLn => {
+                println!();
+            }
             OpCode::Halt => {
                 self.running = false;
             }
+            
+            _ => return Err(VMError::InvalidOpCode(opcode.convert_to_u8())),
+
         }
         Ok(())
         
     }
+
     
     pub fn run_solution(&mut self) -> Result<(), VMError> {
         self.running = true;
@@ -231,6 +310,10 @@ impl VM {
             instruction_count += 1;
             if instruction_count > max_instructions {
                 return Err(VMError::InfiniteLoopDetected);
+            }
+            if let Err(e) = self.execute_instruction() {
+                self.print_stack_trace();
+                return Err(e);
             }
             self.execute_instruction()?;
         }
@@ -255,6 +338,10 @@ impl VM {
 
     pub fn current_ip(&self) -> usize {
         self.ip
+    }
+
+    pub fn call_stack_depth(&self) -> usize {
+        self.call_stack.len()
     }
 
 }

@@ -1,5 +1,6 @@
-use crate::{disassembler, opcode::OpCode};
+use crate::{opcode::OpCode};
 
+// a disassembler converts bytecode into readable instruction   
 pub struct Disassembler {
     bytecode: Vec<u8>,
     offset: usize,

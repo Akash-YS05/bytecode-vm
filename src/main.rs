@@ -5,6 +5,7 @@ mod vm;
 mod memory;
 mod examples;
 mod disassembler;
+mod callframe;
 
 use vm::VM;
 use opcode::OpCode;
