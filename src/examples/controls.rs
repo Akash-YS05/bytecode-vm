@@ -150,9 +150,9 @@ pub fn example_while_loop() {
     // JUMP_IF_FALSE to end
     bytecode.push(OpCode::JumpIfFalse.convert_to_u8());
     let loop_exit_placeholder = bytecode.len();
-    bytecode.extend(encode_usize(0)); // Placeholder
+    bytecode.extend(encode_usize(0)); 
     
-    // Loop body: counter = counter + 1
+    // loop body: counter = counter + 1
     bytecode.push(OpCode::LoadVar.convert_to_u8());
     bytecode.extend(encode_string("counter"));
     bytecode.push(OpCode::Push.convert_to_u8());
@@ -161,11 +161,10 @@ pub fn example_while_loop() {
     bytecode.push(OpCode::StoreVar.convert_to_u8());
     bytecode.extend(encode_string("counter"));
     
-    // Jump back to loop start
+    // jump back to start of the loop
     bytecode.push(OpCode::Jump.convert_to_u8());
     bytecode.extend(encode_usize(loop_start));
     
-    // Loop end
     let loop_end = bytecode.len();
     bytecode.push(OpCode::Halt.convert_to_u8());
     

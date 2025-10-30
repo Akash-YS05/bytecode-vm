@@ -23,6 +23,17 @@ pub enum OpCode {
     Jump,   //unconditional jump
     JumpIfFalse,    //jump if T.O.S is falsy
 
+    // function operators
+    Call,
+    Return,
+    StoreLocal,
+    LoadLocal,
+
+    // I/O operations
+    Print,
+    PrintVal,
+    PrintLn,
+
     //program termination
     Halt
 }
@@ -46,6 +57,13 @@ impl OpCode {
             13  => Some(OpCode::Neq),
             14 => Some(OpCode::Jump),
             15 => Some(OpCode::JumpIfFalse),
+            16 => Some(OpCode::Call),
+            17 => Some(OpCode::Return),
+            18 => Some(OpCode::StoreLocal),
+            19 => Some(OpCode::LoadLocal),
+            20 => Some(OpCode::Print),
+            21 => Some(OpCode::PrintVal),
+            22 => Some(OpCode::PrintLn),
             _ => None,
         }
     }
@@ -67,6 +85,13 @@ impl OpCode {
             OpCode::Neq => 13,
             OpCode::Jump => 14,
             OpCode::JumpIfFalse => 15,
+            OpCode::Call => 16,
+            OpCode::Return => 17,
+            OpCode::StoreLocal => 18,
+            OpCode::LoadLocal => 19,
+            OpCode::Print => 20,
+            OpCode::PrintVal => 21,
+            OpCode::PrintLn => 22,
         }
     }
 
@@ -87,6 +112,13 @@ impl OpCode {
             OpCode::Neq => "NEQ",
             OpCode::Jump => "JUMP",
             OpCode::JumpIfFalse => "JUMP_IF_FALSE",
+            OpCode::Call => "CALL",
+            OpCode::Return => "RETURN",
+            OpCode::StoreLocal => "STORE_LOCAL",
+            OpCode::LoadLocal => "LOAD_LOCAL",
+            OpCode::Print => "PRINT",
+            OpCode::PrintVal => "PRINT_VAL",
+            OpCode::PrintLn => "PRINT_LN",
             OpCode::Halt => "HALT",
         }
     }
